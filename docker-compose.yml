@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: exam-prep-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: examprep
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - exam-prep-network
+
+  # Backend API
+  backend:
+    build: ./backend
+    container_name: exam-prep-backend
+    ports:
+      - "5000:5000"
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/examprep?schema=public
+      JWT_SECRET: your-super-secret-jwt-key-change-this
+      PORT: 5000
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      - db
+    networks:
+      - exam-prep-network
+
+  # Frontend React App
+  frontend:
+    build: ./frontend
+    container_name: exam-prep-frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      NODE_ENV: development
+      VITE_API_URL: http://localhost:5000
+    stdin_open: true
+    depends_on:
+      - backend
+    networks:
+      - exam-prep-network
+
+# Named volumes for persistent data
+volumes:
+  postgres_data:
+
+# Network for inter-container communication
+networks:
+  exam-prep-network:
+    driver: bridge
