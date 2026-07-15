@@ -1,4 +1,3 @@
-// backend/prisma/schema.prisma
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,11 +7,52 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// We'll add User model later
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  materials StudyMaterial[]
+}
+
+model StudyMaterial {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  questionSets QuestionSet[]
+}
+
+model QuestionSet {
+  id              Int      @id @default(autoincrement())
+  title           String
+  mode            String
+  difficulty      String
+  studyMaterialId Int
+  studyMaterial   StudyMaterial @relation(fields: [studyMaterialId], references: [id])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  questions Question[]
+}
+
+model Question {
+  id            Int      @id @default(autoincrement())
+  questionText  String
+  optionA       String
+  optionB       String
+  optionC       String
+  optionD       String
+  correctAnswer String
+  explanation   String?
+  questionSetId Int
+  questionSet   QuestionSet @relation(fields: [questionSetId], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }

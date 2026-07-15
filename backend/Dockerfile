@@ -1,6 +1,9 @@
 # Use official Node.js image (Alpine for smaller size)
 FROM node:22-alpine
 
+# Install OpenSSL (required for Prisma)
+RUN apk add --no-cache openssl
+
 # Set working directory inside container
 WORKDIR /app
 
@@ -13,7 +16,7 @@ RUN npm install
 # Copy the rest of the application
 COPY . .
 
-# Generate Prisma client (after dependencies are installed)
+# Generate Prisma client
 RUN npx prisma generate
 
 # Expose the port the app runs on
