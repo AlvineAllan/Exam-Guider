@@ -1,5 +1,6 @@
+import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
 
 export default function Dashboard() {
   const { user, logout } = useAuth();
@@ -29,15 +30,15 @@ export default function Dashboard() {
         </p>
 
         <div style={styles.card}>
-          <h3 style={styles.cardTitle}>Next steps</h3>
-          <ul style={styles.list}>
-            <li>Upload or paste your study materials</li>
-            <li>Generate practice questions with AI</li>
-            <li>Take quizzes and track your progress</li>
-          </ul>
-          <p style={styles.note}>
-            (We will build these features next)
-          </p>
+          <h3 style={styles.cardTitle}>What would you like to do?</h3>
+          <div style={styles.actions}>
+            <Link to="/materials" style={styles.primaryBtn}>
+              My Study Materials
+            </Link>
+            <Link to="/materials/new" style={styles.secondaryBtn}>
+              + Add New Material
+            </Link>
+          </div>
         </div>
       </main>
     </div>
@@ -45,10 +46,7 @@ export default function Dashboard() {
 }
 
 const styles = {
-  container: {
-    minHeight: '100vh',
-    background: '#f5f7fa',
-  },
+  container: { minHeight: '100vh', background: '#f5f7fa' },
   header: {
     background: 'white',
     padding: '16px 32px',
@@ -57,16 +55,8 @@ const styles = {
     alignItems: 'center',
     boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
   },
-  logo: {
-    fontSize: '22px',
-    fontWeight: 700,
-  },
-  userInfo: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '16px',
-    fontSize: '14px',
-  },
+  logo: { fontSize: '22px', fontWeight: 700 },
+  userInfo: { display: 'flex', alignItems: 'center', gap: '16px', fontSize: '14px' },
   logoutBtn: {
     padding: '8px 16px',
     background: '#ef4444',
@@ -75,38 +65,29 @@ const styles = {
     borderRadius: '6px',
     fontWeight: 600,
   },
-  main: {
-    maxWidth: '800px',
-    margin: '40px auto',
-    padding: '0 20px',
-  },
-  heading: {
-    fontSize: '28px',
-    marginBottom: '8px',
-  },
-  subtext: {
-    color: '#666',
-    marginBottom: '32px',
-  },
+  main: { maxWidth: '800px', margin: '40px auto', padding: '0 20px' },
+  heading: { fontSize: '28px', marginBottom: '8px' },
+  subtext: { color: '#666', marginBottom: '32px' },
   card: {
     background: 'white',
     borderRadius: '12px',
     padding: '28px',
     boxShadow: '0 4px 12px rgba(0,0,0,0.06)',
   },
-  cardTitle: {
-    marginBottom: '16px',
-    fontSize: '18px',
+  cardTitle: { marginBottom: '20px', fontSize: '18px' },
+  actions: { display: 'flex', gap: '16px', flexWrap: 'wrap' },
+  primaryBtn: {
+    background: '#667eea',
+    color: 'white',
+    padding: '12px 24px',
+    borderRadius: '8px',
+    fontWeight: 600,
   },
-  list: {
-    paddingLeft: '20px',
-    lineHeight: 1.8,
-    color: '#444',
-  },
-  note: {
-    marginTop: '20px',
-    fontSize: '14px',
-    color: '#888',
-    fontStyle: 'italic',
+  secondaryBtn: {
+    background: '#e0e7ff',
+    color: '#4338ca',
+    padding: '12px 24px',
+    borderRadius: '8px',
+    fontWeight: 600,
   },
 };

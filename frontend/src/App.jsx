@@ -1,8 +1,11 @@
+import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import Materials from './pages/Materials';
+import CreateMaterial from './pages/CreateMaterial';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -31,6 +34,22 @@ function App() {
         element={
           <ProtectedRoute>
             <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/materials"
+        element={
+          <ProtectedRoute>
+            <Materials />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/materials/new"
+        element={
+          <ProtectedRoute>
+            <CreateMaterial />
           </ProtectedRoute>
         }
       />
