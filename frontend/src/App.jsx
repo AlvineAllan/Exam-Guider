@@ -6,6 +6,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Materials from './pages/Materials';
 import CreateMaterial from './pages/CreateMaterial';
+import MaterialDetail from './pages/MaterialDetail';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -50,6 +51,14 @@ function App() {
         element={
           <ProtectedRoute>
             <CreateMaterial />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/materials/:id"
+        element={
+          <ProtectedRoute>
+            <MaterialDetail />
           </ProtectedRoute>
         }
       />
