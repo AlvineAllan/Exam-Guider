@@ -1,7 +1,9 @@
+// frontend/src/pages/MaterialDetail.jsx
 import React, { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getMaterial, deleteMaterial } from '../api/materials';
+import { generateQuestions } from '../api/questions';
 
 export default function MaterialDetail() {
   const { id } = useParams();
@@ -11,6 +13,11 @@ export default function MaterialDetail() {
   const [material, setMaterial] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  const [difficulty, setDifficulty] = useState('medium');
+  const [generating, setGenerating] = useState(false);
+  const [genError, setGenError] = useState('');
+  const [generated, setGenerated] = useState(null);
 
   useEffect(() => {
     const fetchMaterial = async () => {
@@ -42,9 +49,18 @@ export default function MaterialDetail() {
     }
   };
 
-  // Placeholder for later
-  const handleGenerateQuestions = () => {
-    alert('Question generation will be added in the next step!');
+  const handleGenerateQuestions = async () => {
+    setGenError('');
+    setGenerated(null);
+    setGenerating(true);
+    try {
+      const data = await generateQuestions(id, { difficulty });
+      setGenerated(data.questionSet);
+    } catch (err) {
+      setGenError(err.response?.data?.error || 'Failed to generate questions.');
+    } finally {
+      setGenerating(false);
+    }
   };
 
   return (
@@ -72,9 +88,6 @@ export default function MaterialDetail() {
             <div style={styles.topBar}>
               <Link to="/materials" style={styles.backLink}>← Back to materials</Link>
               <div style={styles.actions}>
-                <button onClick={handleGenerateQuestions} style={styles.generateBtn}>
-                  Generate Questions
-                </button>
                 <button onClick={handleDelete} style={styles.deleteBtn}>
                   Delete
                 </button>
@@ -90,6 +103,44 @@ export default function MaterialDetail() {
               <div style={styles.content}>
                 {material.content}
               </div>
+            </div>
+
+            {/* Generate questions box */}
+            <div style={styles.card}>
+              <h2 style={styles.sectionTitle}>🧠 Generate Questions</h2>
+              <div style={styles.genRow}>
+                <label style={styles.label}>Difficulty:</label>
+                <select
+                  value={difficulty}
+                  onChange={(e) => setDifficulty(e.target.value)}
+                  style={styles.select}
+                >
+                  <option value="easy">Easy</option>
+                  <option value="medium">Medium</option>
+                  <option value="hard">Hard</option>
+                </select>
+                <button
+                  onClick={handleGenerateQuestions}
+                  style={styles.generateBtn}
+                  disabled={generating}
+                >
+                  {generating ? 'Generating…' : 'Generate Questions'}
+                </button>
+              </div>
+
+              {generating && <p style={styles.hint}>This can take up to a minute on the free tier. Please wait…</p>}
+
+              {genError && <div style={styles.genError}>{genError}</div>}
+
+              {generated && (
+                <div style={styles.successBox}>
+                  ✅ Created <strong>{generated.questions.length} questions</strong> ({generated.difficulty})!
+                  <p style={styles.hint}>
+                    The question set is saved as “{generated.title}”. The quiz-taking view comes in the next step —
+                    for now you can verify it via <code>GET /api/questions/sets/{generated.id}</code>.
+                  </p>
+                </div>
+              )}
             </div>
           </>
         )}
@@ -170,15 +221,6 @@ const styles = {
     gap: '10px',
     flexWrap: 'wrap',
   },
-  generateBtn: {
-    background: '#667eea',
-    color: 'white',
-    border: 'none',
-    padding: '10px 16px',
-    borderRadius: '8px',
-    fontWeight: 600,
-    fontSize: '14px',
-  },
   deleteBtn: {
     background: '#fee2e2',
     color: '#b91c1c',
@@ -193,6 +235,7 @@ const styles = {
     borderRadius: '12px',
     padding: '24px 20px',
     boxShadow: '0 4px 12px rgba(0,0,0,0.06)',
+    marginBottom: '20px',
   },
   title: {
     fontSize: '24px',
@@ -209,5 +252,58 @@ const styles = {
     lineHeight: 1.7,
     whiteSpace: 'pre-wrap',
     color: '#333',
+  },
+  sectionTitle: {
+    fontSize: '18px',
+    marginBottom: '16px',
+  },
+  genRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    flexWrap: 'wrap',
+  },
+  label: {
+    fontSize: '14px',
+    fontWeight: 600,
+    color: '#444',
+  },
+  select: {
+    padding: '8px 12px',
+    borderRadius: '8px',
+    border: '1px solid #ddd',
+    fontSize: '14px',
+  },
+  generateBtn: {
+    background: '#667eea',
+    color: 'white',
+    border: 'none',
+    padding: '10px 16px',
+    borderRadius: '8px',
+    fontWeight: 600,
+    fontSize: '14px',
+    cursor: 'pointer',
+  },
+  hint: {
+    fontSize: '13px',
+    color: '#888',
+    marginTop: '12px',
+    lineHeight: 1.5,
+  },
+  genError: {
+    marginTop: '12px',
+    background: '#fee2e2',
+    color: '#b91c1c',
+    padding: '10px 12px',
+    borderRadius: '8px',
+    fontSize: '14px',
+  },
+  successBox: {
+    marginTop: '16px',
+    background: '#d1fae5',
+    color: '#065f46',
+    padding: '14px 16px',
+    borderRadius: '8px',
+    fontSize: '15px',
   },
 };
